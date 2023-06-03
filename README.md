@@ -1,2 +1,2 @@
 # mashr_intro
-An example of when and how to use MASHR (multivariate adaptive shrinkage) for improved treatment effect estimates
+Full source R markdown for the post @ https://ryansritter.com/post/mashr/
