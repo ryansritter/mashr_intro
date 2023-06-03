@@ -1,10 +1,17 @@
 ---
-title: "Improving treatment effect estimates with multivariate adaptive shrinkage (mashr)"
-authors: 
+authors:
 - admin
-date: 2023-05-30
-categories: []
-tags: []
+categories:
+date: "2023-06-02"
+draft: false
+featured: true
+image:
+lastmod: ""
+projects: []
+subtitle: ""
+summary: "An illustrative example of when and how to use MASHR (multivariate adaptive shrinkage) for improved treatment effect estimates."
+tags:
+title: "Improving treatment effect estimates with multivariate adaptive shrinkage (mashr)"
 ---
 
 ```{r setup, include=FALSE}
@@ -16,7 +23,9 @@ library(tidyverse)
 library(mashr)
 ```
 
-Suppose that you have many experiments and their corresponding observed treatment effects on multiple outcome metrics, or perhaps you want to determine if one metric is a good "proxy" or "surrogate" for another more difficult or expensive to measure ground truth metric of interest (see our work on the [experimentation with modeled variables playbook (xMVP)](https://ryansritter.com/project/xmvp/)). Multivariate adaptive shrinkage (mashr) is your friend. It will provide improved posterior treatment effect estimates by leveraging the information about the patterns of similarity across experiments while also effectively correcting for multiple comparisons.
+Suppose that you have many experiments and their corresponding observed treatment effects on multiple outcome metrics, or perhaps you want to determine if one metric is a good "proxy" or "surrogate" for another more difficult or expensive to measure ground truth metric of interest (see our work on the [experimentation with modeled variables playbook, xMVP](https://ryansritter.com/project/xmvp/)). 
+
+Multivariate adaptive shrinkage (mashr) is your friend. It will provide improved posterior treatment effect estimates by leveraging the information about the patterns of similarity across experiments while also effectively correcting for multiple comparisons.
 
 ## An illustrative example
 
@@ -48,7 +57,7 @@ df <- tibble(
 df %>% summarise(correlation = cor(a, b))
 ```
 
-Next let's create 1000 A/A tests by randomly assigning people to treatment or control groups:
+Next let's simulate 1000 A/A tests by randomly assigning people to treatment or control groups:
 
 ```{r}
 df <- df %>%
@@ -113,7 +122,7 @@ treatment_effects <- df %>%
     )
 ```
 
-What do we observe? Recall that the unit level correlation between `a` and `b` is r = 0.40. Now, even though there are no "real" treatment effects in any of these experiments (i.e., they are all A/A tests), **we will still observe a correlation among the treatment effects around this same value (i.e., r = 0.40) due to correlated sampling error.** As expected, we also observe a false positive rate of around 5% for each metric:
+What do we observe? As expected, we observe a false positive rate of around 5% for each metric. But more importantly, recall that the unit level correlation between metrics `a` and `b` is r = 0.40. Now, even though there are no "real" treatment effects in any of these experiments (i.e., they are all A/A tests), **we still expect to observe a correlation among the treatment effects around this same value (i.e., r = 0.40) due to correlated sampling error.** 
 
 ```{r}
 # look at correlation of treatment effects and frequency of false positives
@@ -124,7 +133,7 @@ treatment_effects %>% summarise(
     )
 ```
 
-To help drive this point home, if we look at a scatter plot of these treatment effects (w/ a regression line) it looks like there's a relationship, but it is actually entirely sampling error:
+To help drive this point home, if we look at a scatter plot of these treatment effects (w/ a regression line) it looks like there could be a relationship, but it is actually entirely a result of sampling error:
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 treatment_effects %>%
@@ -147,7 +156,9 @@ treatment_effects %>%
     
 ```
 
-We know that the "real" treatment effect for all of these experiments is actually 0 - so what can we do to get better estimates of our treatment effects? Apply multivariate adaptive shrinkage (mashr).
+Given that we know the "real" treatment effect for all of these experiments is actually 0, what can we do to get better estimates? 
+
+Apply multivariate adaptive shrinkage (mashr).
 
 ## Applying mashr
 
@@ -244,7 +255,11 @@ get_estimated_pi(mashr_results)
 
 ## Takeaway
 
-Any time we have observed treatment effects on multiple outcomes -- here we just used two outcomes but in practice we could have many, many more! -- multivariate adaptive shrinkage (mashr) is an extremely valuable tool for deriving improved (posterior) treatment effect estimates for all of them by leveraging all the shared information across experiments. It is also particularly useful when evaluating the utility of a "proxy" or "surrogate" metric, because it will result in better estimates of how often the proxy vs. ground truth treatment effects actually correspond with each other in direction and/or magnitude.
+Any time we have observed treatment effects on multiple outcomes -- here we just used two outcomes but in practice we could have many, many more! -- multivariate adaptive shrinkage (mashr) is an extremely valuable tool for deriving improved (posterior) treatment effect estimates for all of them by leveraging all the shared information across experiments. 
+
+`mashr` is also particularly useful when evaluating the utility of a "proxy" or "surrogate" metric, because it will result in better estimates of how often the proxy vs. ground truth treatment effects actually correspond with each other in direction and/or magnitude.
+
+*Note: full R Markdown used for this post is available @ https://github.com/ryansritter/mashr_intro*
 
 ### Recommendations for further reading
 
